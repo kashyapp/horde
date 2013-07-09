@@ -1,0 +1,11 @@
+#!/bin/bash -e
+alias redis-cli=cat
+
+DUMP='\r\xc3@d@n\x04n\x00\x00\x00i \x03\x13\x12\x00\x00\x04gold\x06\xfed\x03\x06silver\b@\n\x11bronze\b\xc0\xc8\x00\x04\x06dollar`\x0b\x05\x04euro\x06@\x15\x06\x05franc\a`\n\x04swiss\x80\n\x04nifty`\n\x0b\x06nasdaq\b\xc0\x90\x01\xff\x06\x00\x18\xd5\xef\x8b-\xcd\xc9X'
+
+cat | redis-cli -p 28330 <<-END
+	restore kashyap 0 "$DUMP"
+	restore kuntal  0 "$DUMP"
+	restore arun    0 "$DUMP"
+	restore me      0 "$DUMP"
+END
