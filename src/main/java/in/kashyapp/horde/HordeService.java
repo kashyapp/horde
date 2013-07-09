@@ -31,7 +31,8 @@ public class HordeService {
     }
 
     private ThreadPool buildThreadPool() {
-        final int poolSize = 8;
+        final String poolsize_str = System.getProperty("poolsize", "8");
+        final int poolSize = Integer.parseInt(poolsize_str);
         final QueuedThreadPool qtp = new QueuedThreadPool(poolSize);
         qtp.setMinThreads(poolSize);
         qtp.setMaxQueued(500);
