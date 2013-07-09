@@ -43,6 +43,7 @@ public class HordeService {
         final HandlerList handlerList = new HandlerList();
         handlerList.addHandler(new PingHandler());
         handlerList.addHandler(new UserDataHandler(new ThreadLocalJedisFactory()));
+        handlerList.addHandler(new NonBlockingHandler(new ThreadLocalJedisFactory()));
         return handlerList;
     }
 
