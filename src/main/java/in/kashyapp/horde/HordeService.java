@@ -23,7 +23,7 @@ public class HordeService {
         server.setGracefulShutdown(500);
         server.setThreadPool(buildThreadPool());
 
-        server.setHandler(buildHandler());
+        server.setHandler(buildHandler(server));
     }
 
     private void start() throws Exception {
@@ -39,11 +39,18 @@ public class HordeService {
         return qtp;
     }
 
-    private Handler buildHandler() {
+    private Handler buildHandler(Server server) {
+        // some manual DI happening here
         final HandlerList handlerList = new HandlerList();
+        final ThreadLocalJedisFactory jedisFactory = new ThreadLocalJedisFactory();
+        final RedisPipeline pipeline = new RedisPipeline(jedisFactory);
+
+        server.addBean(pipeline);
+
         handlerList.addHandler(new PingHandler());
-        handlerList.addHandler(new UserDataHandler(new ThreadLocalJedisFactory()));
-        handlerList.addHandler(new NonBlockingHandler(new ThreadLocalJedisFactory()));
+        handlerList.addHandler(new UserDataHandler(jedisFactory));
+        handlerList.addHandler(new NonBlockingHandler(pipeline));
+
         return handlerList;
     }
 

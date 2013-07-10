@@ -21,9 +21,8 @@ import java.util.Map;
  * Time: 08/07/13 9:59 AM
  */
 public class UserDataHandler extends AbstractTargetHandler {
-    private static final Logger log = LoggerFactory.getLogger(UserDataHandler.class);
-
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final Logger log = LoggerFactory.getLogger(UserDataHandler.class);
+    private final ObjectMapper mapper = new ObjectMapper();
     private final JedisFactory jedisFactory;
 
     public UserDataHandler(JedisFactory jedisFactory) {

@@ -21,7 +21,7 @@ public class ThreadLocalJedisFactory implements JedisFactory {
     public Jedis get() {
         Jedis jedis = jedisHolder.get();
         if (jedis == null) {
-            log.info("");
+            log.info("new Jedis instance for {}", Thread.currentThread());
             jedis = new Jedis("localhost", 28330);
             jedisHolder.set(jedis);
         }
