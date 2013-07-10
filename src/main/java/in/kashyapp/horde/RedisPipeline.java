@@ -5,8 +5,6 @@ import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.PipelineBlock;
-import redis.clients.jedis.exceptions.JedisException;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -24,9 +22,9 @@ import static com.google.common.collect.Queues.newLinkedBlockingQueue;
  * Time: 10/07/13 12:01 PM
  */
 public class RedisPipeline extends AbstractLifeCycle implements Runnable {
+    protected static final String REDIS_RESPONSE = "redisResponse";
     private final Logger log = LoggerFactory.getLogger(RedisPipeline.class);
 
-    private final ObjectMapper mapper = new ObjectMapper();
     private final BlockingQueue<Request> queue = newLinkedBlockingQueue();
     private final JedisFactory jedisFactory;
     private final Thread worker;
@@ -81,17 +79,8 @@ public class RedisPipeline extends AbstractLifeCycle implements Runnable {
         for (int i = 0; i < requests.size(); ++i) {
             Request request = requests.get(i);
             Object response = responses.get(i);
-            if (response instanceof Map) {
-                try {
-                    mapper.writeValue(
-                            request.continuation.getServletResponse().getWriter(),
-                            response
-                    );
-                } catch (IOException e) {
-                    // TODO
-                }
-            }
-            request.continuation.complete();
+            request.continuation.setAttribute(REDIS_RESPONSE, response);
+            request.continuation.resume();
         }
     }
 

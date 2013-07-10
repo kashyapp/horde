@@ -22,6 +22,7 @@ import java.io.IOException;
 public class NonBlockingHandler extends AbstractTargetHandler {
     private final Logger log = LoggerFactory.getLogger(NonBlockingHandler.class);
     private final RedisPipeline pipeline;
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public NonBlockingHandler(RedisPipeline pipeline) {
         super("/nonblock");
@@ -30,14 +31,21 @@ public class NonBlockingHandler extends AbstractTargetHandler {
 
     @Override
     public void handle(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(MimeTypes.TEXT_JSON_UTF_8);
-        response.setHeader(HttpHeaders.CACHE_CONTROL, HttpHeaderValues.NO_CACHE);
-
-        final String userId = request.getParameter("_u");
-
         final Continuation continuation = ContinuationSupport.getContinuation(request);
-        continuation.suspend(response);
 
-        pipeline.request(userId, continuation);
+        if (continuation.isInitial()) {
+            response.setContentType(MimeTypes.TEXT_JSON_UTF_8);
+            response.setHeader(HttpHeaders.CACHE_CONTROL, HttpHeaderValues.NO_CACHE);
+
+            final String userId = request.getParameter("_u");
+            continuation.suspend();
+            pipeline.request(userId, continuation);
+        } else {
+            final Object redisResponse = continuation.getAttribute(RedisPipeline.REDIS_RESPONSE);
+            mapper.writeValue(
+                    response.getWriter(),
+                    redisResponse
+            );
+        }
     }
 }
