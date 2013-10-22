@@ -3,6 +3,7 @@ package in.kashyapp.horde;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
@@ -51,7 +52,10 @@ public class HordeService {
         handlerList.addHandler(new UserDataHandler(jedisFactory));
         handlerList.addHandler(new NonBlockingHandler(pipeline));
 
-        return handlerList;
+        SessionHandler sessionHandler = new SessionHandler();
+        sessionHandler.setHandler(handlerList);
+
+        return sessionHandler;
     }
 
     public static void main(String[] args) throws Exception {
