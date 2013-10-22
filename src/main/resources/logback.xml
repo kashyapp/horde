@@ -1,11 +1,32 @@
-<configuration debug="false">
+<configuration debug="true">
+
+  <!-- Unused Console Appender -->
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%-5level %d{HH:mm:ss.SSS} [%thread] %logger{24} [%F:%L] - %msg%n</pattern>
     </encoder>
   </appender>
+
+  <!-- File Appender with rolling policy -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/horde.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>logs/logFile.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%-5level %d{HH:mm:ss.SSS} [%thread] %logger{24} [%F:%L] - %msg%n%rEx</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Attach appender at root -->
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="FILE" />
   </root>
+
+  <!-- Custom loglevels -->
   <logger level="DEBUG" name="in.kashyapp.horde.RedisPipeline" />
+
 </configuration>
